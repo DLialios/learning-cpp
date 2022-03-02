@@ -1,0 +1,217 @@
+reference qualified member functions
+
+argument dependent lookup (ADL)
+
+lifetime extension of temporaries via rval refs
+    - a temporary bound to a return value of a function
+      in a return statement is not extended: it is 
+      destroyed immediately at the end of the return 
+      expression. Such function always returns a dangling 
+      reference.
+
+std::cout << "hello" << "\n";
+std::operator<<(std::operator<<(std::cout, "hello"), "\n");
+
+The technique of acquiring resources in a
+constructor and releasing them in a destructor,
+known as Resource Acquisition Is Initialization or RAII,
+allows us to eliminate ‘‘naked new operations,’’ that is, 
+to avoid allocations in general code and keep them buried 
+inside the implementation of well-behaved abstractions. 
+
+dynamic cast --> only casts to reference type throw
+                 Does this polymorphic object have the
+                 given class in its hierarchy?
+static cast
+reinterpret cast
+const cast
+
+early vs late binding and runtime polymorphism
+
+vtables in class objects
+
+inheritance access modifiers
+
+one implicit conversion of function parameters
+
+explicit keyword
+
+A virtual destructor is essential for an 
+abstract class because an object of a 
+derived class is usually manipulated through 
+the interface provided by its abstract base 
+class. In particular, it may be deleted through 
+a pointer to a base class. Then, the virtual 
+function call mechanism ensures that the proper 
+destructor is called. That destructor then 
+implicitly invokes the destructors of its bases and members.
+
+smart pointers: unique_ptr, shared_ptr, weak_ptr
+func(unique_ptr<MyClass>(new MyClass), a(), b());
+
+only lambdas without captures decay to function pointers
+
+conversion constructor vs conversion function
+
+functions =delete and =default
+
+rules for automatic generation of essential class functions
+
+1) CTOR args
+2) base class constructor
+3) constructor member initializer list; 
+   use default member initializers if missing 
+4) actual CTOR body
+
+default member initializers allow only initializers of
+the “= initializer-clause” and “{ initializer-list }” forms
+
+new and delete keywords; they call operator new() and 
+operator delete() as well as construct/destruct the object itself
+
+Rule of Zero: If you can avoid defining default operations, do
+Rule of Five: If you define or =delete any copy, move, or 
+              destructor function, define or =delete them all
+
+double& operator[](int i);
+        versus
+const double& operator[](int i) const;
+
+In particular, we can achieve strong resource safety;
+that is, we can eliminate resource leaks for a 
+general notion of a resource. Examples are vectors 
+holding memory, threads holding system threads, 
+and fstreams holding file handles.
+
+Also, memory is not the only resource. A resource 
+is anything that has to be acquired and (explicitly 
+or implicitly) released after use. Examples are memory, 
+locks, sockets, file handles, and thread handles.
+
+Before resorting to garbage collection, systematically 
+use resource handles: let each resource have an owner 
+in some scope and by default be released at the end 
+of its owners scope.
+
+RAII is pervasive in the STL and the result is implicit 
+resource management that is invisible in common use
+with low resource retention durations.
+
+CTAD in c++17
+c++11 -> only function templates could have their 
+         template arguments deduced
+
+A “template function” is the instantiation of a “function template”.
+A “parameterized type” is another way to say “class template.” 
+
+typename vs class 
+- specifying a template: same
+- use typename for dependent names
+- use class for explicit template instantiation 
+    - other translation units can call the function
+      in unexpected ways because of specialization
+      (same goes for creating objects from a template
+      class instantiated in another translation unit)
+    eg. template class Foo<std::string>;
+            --> explicit parameterized type instantiation
+    eg. template void print<std::string>(std::string);
+            --> explicit function template instantiation
+- use class for template template (not required since c++17)
+
+template function overload resolution:
+- nontemplate functions are first-class citizens
+- if it's clear that there's one "most specialized" 
+  function base template, that one gets used. If 
+  that base template happens to be specialized for 
+  the types being used, the specialization will get used
+- the call is ambiguous if there is a tie for the 
+  "most specialized" function base template
+
+fold types:
+- unary right fold (vals + ...) becomes 
+  (vals[0] + (... + (vals[N-1] + vals[N])))
+- unary left fold (... + vals) becomes
+  (((vals[0] + vals[1]) + ...) + vals[N])
+- binary right fold (vals + ... + 0) becomes
+  (vals[0] + (... + (vals[N-1] + (vals[N] + 0))))
+- binary left fold (0 + ... + vals) becomes
+  ((((0 + vals[0]) + vals[1]) + ...) + vals[N])
+  
+using vs typedef vs namespace
+- alias templates only work with 'using'
+- 'typedef' declarations are technically init-statements
+
+In computing, type introspection is the ability of a
+program to examine the type or properties of an object
+at runtime. Some programming languages possess this capability.
+Introspection should not be confused with reflection, 
+which goes a step further and is the ability for a program 
+to manipulate the values, meta-data, properties and/or 
+functions of an object at runtime. Some programming languages,
+e.g. Java, also possess that capability.
+
+A template argument for which a concept is specified is
+called a constrained argument and a template for which 
+an argument is constrained is called a constrained template.
+
+Types of pointers to member functions:
+Bar (Bar::*ptr)(const Bar&) const;
+
+Return value optimization (RVO) is a certain kind of copy elision
+
+Substitution failure is not an error (SFINAE)
+
+every expression has two independent properties:
+type and value category
+
+the three primary value categories are:
+prvalue lvalue xvalue 
+    Pure rvalue refers to an object that is a temporary in the 
+    “pure sense": an expression for which the compiler can tell 
+    with absolute certainty that its evaluation is an object 
+    that is a temporary that has just been created and that is
+    immediately expiring (unless we intervene to prolong it’s 
+    lifetime by reference binding). The object was created during
+    the evaluation of the expression and it will die according to
+    the rules of the “mother expression".
+    An expiring value is an expression that evaluates to a reference
+    to an object that is promised to expire soon. That is it gives
+    you a promise that you can do whatever you want to this object
+    because it will be destroyed next anyway. But you don’t know 
+    when this object was created, or when it is supposed to be 
+    destroyed. You just know that you “intercepted" it as it is 
+    just about to die.
+
+decltype(e)
+    - if e is an unparenthesized id-expression then yield the type
+      of the entity named by e
+    - if the name of an object is parenthesized,
+      it is treated as an ordinary lvalue expression
+    - if the value category of expression is prvalue,
+      then decltype yields T
+    - if the value category of expression is lvalue,
+      then decltype yields T&
+    - if the value category of expression is xvalue, 
+      then decltype yields T&&
+
+The rules of reference collapsing apply when you use references 
+to references through one of the following contexts:
+    - A decltype specifier
+    - A typedef name
+    - A template type param
+
+const type qualifier is useless on function return types
+
+If a variable or parameter is declared to have type T&& 
+for some deduced type T, that variable or parameter is a
+universal reference.
+
+Function template argument deduction:
+  the special case of forwarding references
+    - If P is a reference type, the referenced type is used for deduction
+    - If P is an rvalue reference to a cv-unqualified template parameter 
+      (so-called forwarding reference), and the corresponding function 
+      call argument is an lvalue, the type lvalue reference to A is 
+      used in place of A for deduction 
+
+noexcept has its own operator
