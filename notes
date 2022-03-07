@@ -199,6 +199,7 @@ to references through one of the following contexts:
     - A decltype specifier
     - A typedef name
     - A template type param
+    - Definition of auto variables
 
 const type qualifier is useless on function return types
 
@@ -215,3 +216,41 @@ Function template argument deduction:
       used in place of A for deduction 
 
 noexcept has its own operator
+
+objects do not have to be referred to by lvalues, they may be
+referred to by rvalues; string literals are lvalues
+
+auto str = "hello"; --> str is const char*
+auto& str = "hello"; --> str is const char &[6]
+
+typedef int* test;
+int a = 3;
+const test (&x) = &a;
+int* const (&z) = &a;
+// x and z have the same type
+
+This ambiguity regarding the lvalueness and rvalueness of what a universal
+reference is bound to is the motivation for std::forward to take a universal
+reference lvalue and convert it into an rvalue only if the expression it’s
+bound to is an rvalue.  The name of the function (“forward”) is an
+acknowledgment that our desire to perform such a conversion is virtually always
+to preserve the calling argument’s lvalueness or rvalueness when passing –
+forwarding – it to another function.
+
+myClassIterator->APublicMethodInMyClass()
+myClassIterator.operator->()->APublicMethodInMyClass()
+
+Integers integers;
+for (auto i : integers)
+    std::cout << i << "\n";
+################################
+for (auto it = integers.begin(), end = integers.end(); it != end; ++it) { 
+    auto i = *it; 
+    std::cout << i << "\n";
+}
+
+iterators sometimes yield temporaries when dereferenced (usually because
+they return a proxy reference)
+
+Function objects used to specify the meaning of key operations of a general
+algorithm are often referred to as policy objects

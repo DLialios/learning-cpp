@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <memory>
+#include <iterator>
 #include "foo.hpp"
 
 namespace Foo 
@@ -25,6 +26,40 @@ namespace Foo
             // DTOR
             ~Baz() override;
 
+            // forward iterator
+            struct Iterator {
+                using iterator_category = std::forward_iterator_tag;
+                using difference_type   = std::ptrdiff_t;
+                using value_type        = double;
+                using pointer           = value_type*;
+                using reference         = value_type&;
+
+                Iterator(pointer ptr) : m_ptr(ptr) {}
+
+                reference operator*() const { return *m_ptr; }
+                pointer operator->() { return m_ptr; }
+
+                Iterator& operator++() {
+                    ++m_ptr;
+                    return *this; 
+                }
+                Iterator operator++(int) {
+                    Iterator tmp = *this;
+                    ++(*this);
+                    return tmp;
+                }
+
+                friend bool operator==(const Iterator& a, const Iterator& b) {
+                    return a.m_ptr == b.m_ptr;
+                }
+                friend bool operator!=(const Iterator& a, const Iterator& b) {
+                    return !(a == b);
+                }
+
+                private:
+                    pointer m_ptr;
+            };
+
             // conversion functions
             operator double() const { 
                 std::cout 
@@ -36,11 +71,11 @@ namespace Foo
 
             // regular functions
             int size() const { return sz; }
-            double* begin() { 
-                return sz ? &arr.get()[0] : nullptr;
+            Iterator begin() { 
+                return Iterator(arr2.get());
             }
-            double* end() {
-                return sz ? &arr.get()[0] + sz : nullptr;
+            Iterator end() { 
+                return Iterator(arr2.get() + sz2);
             }
 
             // operator overloads
@@ -51,9 +86,11 @@ namespace Foo
 
             // friends
             friend void swap(Baz&,Baz&) noexcept;
+            friend std::ostream& operator<<(std::ostream&, const Baz&);
     };
 
     extern void swap(Foo::Baz&,Foo::Baz&) noexcept;
+    extern std::ostream& operator<<(std::ostream&, const Baz&);
 }
 
 #endif

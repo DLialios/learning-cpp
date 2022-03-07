@@ -100,3 +100,7 @@ void Foo::swap(Foo::Baz& a, Foo::Baz& b) noexcept
     swap(a.sz2, b.sz2);
     swap(a.arr2, b.arr2);
 }
+
+std::ostream& Foo::operator<<(std::ostream& out, const Foo::Baz& obj) {
+    return out << "obj[0] = " << obj[0];
+}
