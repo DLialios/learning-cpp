@@ -183,10 +183,7 @@ prvalue lvalue xvalue
     just about to die.
 
 decltype(e)
-    - if e is an unparenthesized id-expression then yield the type
-      of the entity named by e
-    - if the name of an object is parenthesized,
-      it is treated as an ordinary lvalue expression
+    - parenthesis denote 'treat this as an expression instead of an entity'
     - if the value category of expression is prvalue,
       then decltype yields T
     - if the value category of expression is lvalue,
@@ -254,3 +251,24 @@ they return a proxy reference)
 
 Function objects used to specify the meaning of key operations of a general
 algorithm are often referred to as policy objects
+
+To use a template, make sure its definition (not just its declaration) 
+is in scope
+
+C++ templates are a compile-time version of duck typing
+
+requires-expressions return booleans
+requires-clauses actually constrain
+concept is a named set of constraints or a logical combination thereof
+
+Template template parameters can also be constrained. In this case argument
+must be less or equally constrained than parameter. Unconstrained template
+template parameters still can accept constrained templates as arguments
+
+member functions with unsatisfied constraints become invisible
+
+an auto keyword in a template parameter can be used to indicate a non-type
+parameter the type of which is deduced at the point of instantiation
+template<is_sortable auto NonTypeParameter, is_sortable TypeParameter>
+
+Templates provide (compile-time) parametric polymorphism

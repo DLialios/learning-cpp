@@ -250,22 +250,49 @@ namespace Templates7 {
     // concepts
     template<typename T>
         concept HasMeth = requires(T v, int i) {
-            {v.meth(i)} -> std::convertible_to<int>;
+            //{v.meth(i)} -> std::convertible_to<int>;
+            // equiv to
+            //requires std::convertible_to<decltype((v.meth(i))),int>;
+
+            {v.meth(i)} noexcept -> std::convertible_to<int>;
+
+            typename T::value_t;
+
+            v+i;
         };
 
-    auto func(HasMeth auto val) {
-        return val.meth(20);
-    }
-    // or
-    template<typename T>
-        requires HasMeth<T>
-        auto f(T val) {
-            return val.meth(20);
-        }
+//    auto f(HasMeth auto val) {
+//        return val.meth(20);
+//    }
+//    // or
+//    template<typename T>
+//        requires HasMeth<T>
+//        auto f(T val) {
+//            return val.meth(20);
+//        }
+//    // or
+//    template<HasMeth T>
+//        auto f(T val) {
+//            return val.meth(20);
+//        }
+//    // or
+//    template<typename T>
+//        requires requires(T v, int i) {
+//            {v.meth(i)} -> std::convertible_to<int>;
+//        }
+//    auto f(T val) {
+//        return val.meth(20);
+//    }
 
     struct S {
-        int meth(int) {
+        int meth(int) noexcept {
             return 42;
+        }
+
+        using value_t = float;
+
+        int operator+(int other) {
+            return other;
         }
     };
 }
