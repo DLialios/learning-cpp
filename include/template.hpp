@@ -261,28 +261,28 @@ namespace Templates7 {
             v+i;
         };
 
-//    auto f(HasMeth auto val) {
-//        return val.meth(20);
-//    }
-//    // or
-//    template<typename T>
-//        requires HasMeth<T>
-//        auto f(T val) {
-//            return val.meth(20);
-//        }
-//    // or
-//    template<HasMeth T>
-//        auto f(T val) {
-//            return val.meth(20);
-//        }
-//    // or
-//    template<typename T>
-//        requires requires(T v, int i) {
-//            {v.meth(i)} -> std::convertible_to<int>;
-//        }
-//    auto f(T val) {
-//        return val.meth(20);
-//    }
+    //    auto f(HasMeth auto val) {
+    //        return val.meth(20);
+    //    }
+    //    // or
+    //    template<typename T>
+    //        requires HasMeth<T>
+    //        auto f(T val) {
+    //            return val.meth(20);
+    //        }
+    //    // or
+    //    template<HasMeth T>
+    //        auto f(T val) {
+    //            return val.meth(20);
+    //        }
+    //    // or
+    //    template<typename T>
+    //        requires requires(T v, int i) {
+    //            {v.meth(i)} -> std::convertible_to<int>;
+    //        }
+    //    auto f(T val) {
+    //        return val.meth(20);
+    //    }
 
     struct S {
         int meth(int) noexcept {
@@ -345,6 +345,7 @@ namespace Templates9 {
     // to forward to explicity provide a template parameter
     template<typename S>
         S&& forward(typename std::remove_reference<S>::type& a) noexcept {
+            std::cout<< "@ " << a << "\n";
             return static_cast<S&&>(a);
         }
 
@@ -353,11 +354,16 @@ namespace Templates9 {
             return std::unique_ptr<T>(new(1) T(forward<Arg>(arg)));
         }
 
-    inline void f() {
-        Foo::Bar b {1,2,3,4};
-        std::unique_ptr obj(factory<Foo::Bar>(b));
-        //std::unique_ptr obj(factory<Foo::Bar>(std::move(b)));
-    }
+    template<typename... T>
+        void g(T&&... t) {  
+            std::cout << "g invoked\n";
+            (std::cout << ... << t) << '\n';
+        }
+
+    template<typename... T>
+        void f(T&&... t) {
+            g(forward<T>(t)...);
+        }
 }
 
 #endif

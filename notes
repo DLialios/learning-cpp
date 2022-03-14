@@ -10,7 +10,7 @@ lifetime extension of temporaries via rval refs
       reference.
 
 std::cout << "hello" << "\n";
-std::operator<<(std::operator<<(std::cout, "hello"), "\n");
+std::operator<<(std::operator<<(std::cout,"hello"),"\n");
 
 The technique of acquiring resources in a
 constructor and releasing them in a destructor,
@@ -257,9 +257,9 @@ is in scope
 
 C++ templates are a compile-time version of duck typing
 
-requires-expressions return booleans
-requires-clauses actually constrain
-concept is a named set of constraints or a logical combination thereof
+requires-expressions vs. requires-clauses
+A concept is a compile-time predicate specifying how one or more types 
+can be used.
 
 Template template parameters can also be constrained. In this case argument
 must be less or equally constrained than parameter. Unconstrained template
@@ -272,3 +272,18 @@ parameter the type of which is deduced at the point of instantiation
 template<is_sortable auto NonTypeParameter, is_sortable TypeParameter>
 
 Templates provide (compile-time) parametric polymorphism
+
+We can omit the first concept parameter when using the inline syntax 
+(either with auto or a template)
+
+The typename... indicates that Tail is a sequence of types. The Tail...
+indicates that tail is a sequence of values of the types in Tail.
+sizeof...() yields size of parameter pack
+
+template parameter pack vs. function parameter pack
+
+A pattern followed by an ellipsis, in which the name of at least one
+parameter pack appears at least once, is expanded into zero or more 
+comma-separated instantiations of the pattern, where the name of the 
+parameter pack is replaced by each of the elements from the pack, in 
+order.
