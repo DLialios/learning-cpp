@@ -5,8 +5,6 @@
 #include <iostream>
 #include <memory>
 #include <vector>
-#include <type_traits>
-#include "foo.hpp"
 
 namespace Templates1
 {
@@ -187,12 +185,12 @@ namespace Templates4
     // Qux(double,double) -> Qux<double>;
     // or 'make' functions:
     template<typename T>
-        Qux<T> make_qux(T a, T b) {
-            return {a,b};
+        Qux<T> make_qux(T&& a, T&& b) {
+            return {std::forward<T>(a),std::forward<T>(b)};
         }
     template<typename T>
-        Qux<T> make_qux(T a) {
-            return {a};
+        Qux<T> make_qux(T&& a) {
+            return {std::forward<T>(a)};
         }
 }
 

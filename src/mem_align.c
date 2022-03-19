@@ -1,3 +1,5 @@
+#include <stdio.h>
+#include <stddef.h>
 #include "mem_align.h"
 
 #pragma GCC diagnostic ignored "-Wuninitialized"

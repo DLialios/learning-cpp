@@ -22,13 +22,13 @@ $(ELF2): $(patsubst %,$(ODIR)/%.14.o,$(basename $(SRC))) \
 	g++ $^ $(patsubst %,-l%,$(LIB)) -o $(BDIR)/$@
 
 $(ODIR)/%.20.o: $(SDIR)/%.cpp $(patsubst %,$(IDIR)/%,$(DEP))
-	g++ -Wall -std=c++20 -Og -g -I$(IDIR) -DCPP20 -c $< -o $@
+	g++ -Wall -std=c++20 -O0 -g -I$(IDIR) -DCPP20 -c $< -o $@
 
 $(ODIR)/%.14.o: $(SDIR)/%.cpp $(patsubst %,$(IDIR)/%,$(DEP))
-	g++ -Wall -std=c++14 -Og -g -fno-elide-constructors -I$(IDIR) -c $< -o $@
+	g++ -Wall -std=c++14 -O0 -g -fno-elide-constructors -I$(IDIR) -c $< -o $@
 
 $(ODIR)/%.cc.o: $(SDIR)/%.c $(patsubst %,$(IDIR)/%,$(DEP))
-	gcc -Wall -Og -g -I$(IDIR) -c $< -o $@
+	gcc -Wall -O0 -g -I$(IDIR) -c $< -o $@
 
 all: options $(ELF1) $(ELF2) 
 
