@@ -34,8 +34,8 @@ namespace Foo
             // operator overloads
             virtual double operator[](int) const;
             virtual double& operator[](int);
-            void* operator new(size_t,int);
-            void operator delete(void*);
+            static void* operator new(size_t,int);
+            static void operator delete(void*);
             Bar& operator=(Bar);
             Bar operator+(const Bar&) const;
 

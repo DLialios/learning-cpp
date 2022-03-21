@@ -1,3 +1,6 @@
+the user shouldn't be forced to pay a cost that they 
+don't absolutely have to
+
 reference qualified member functions
 
 const pointer vs pointer to const
@@ -72,6 +75,16 @@ the “= initializer-clause” and “{ initializer-list }” forms
 
 new and delete keywords; they call operator new() and 
 operator delete() as well as construct/destruct the object itself
+::new(placement-params) type|initializer
+new expressions evaluate to a pvalue of type "pointer to x"
+The default placement new allows you to construct an object 
+in memory that's already allocated.  
+
+deallocate vs deconstruct
+  Bar* b = new(42) Bar;
+  b->~Bar();
+  ::new(b) Bar;
+  delete b; // delete calls the dtor
 
 Rule of Zero: If you can avoid defining default operations, do
 Rule of Five: If you define or =delete any copy, move, or 
@@ -306,3 +319,7 @@ ordinary member functions get 3 things:
 3 must be invoked on an instance
 -->friends get only 1
 -->static functions get 1 and 2
+
+It is generally in poor taste to dump every name from a namespace
+into the global namespace
+All standard-library headers supply declarations in namespace std
