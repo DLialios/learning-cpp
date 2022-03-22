@@ -1,6 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <string>
+#include <exception>
 #include "foo.hpp"
 #include "yoda.hpp"
 
@@ -122,6 +123,19 @@ void throw_test()
     } catch (const Foo::Bar& e) {
         std::cout << e[1] << std::endl;
     }
+}
+
+void throw_test2()
+{
+    std::vector v {42,42};
+    try {
+        std::cout << v.at(v.size());
+    } catch (const std::exception& e) {
+        std::cerr << e.what() << '\n';
+    }
+    /* catch-all
+     * catch(...) {}
+     */
 }
 
 void udl()

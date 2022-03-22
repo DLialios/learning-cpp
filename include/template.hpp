@@ -364,5 +364,21 @@ namespace Templates9 {
         }
 }
 
+namespace Templates10 {
+    template<typename T>
+        class Vec : public std::vector<T> {
+            public:
+                using std::vector<T>::vector;
+
+                T& operator[](int i) {
+                    return this->at(i);
+                }
+
+                const T& operator[](int i) const {
+                    return std::vector<T>::at(i);
+                }
+        };
+}
+
 #endif
 #endif

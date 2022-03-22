@@ -323,3 +323,33 @@ ordinary member functions get 3 things:
 It is generally in poor taste to dump every name from a namespace
 into the global namespace
 All standard-library headers supply declarations in namespace std
+
+use std::list where you need to insert/erase elements and not invalidate
+iterators. std::vector invalidates all iterators on insert and erase.
+std::list guarantees that iterators to existing elements are still 
+valid 
+
+use find() and insert() for maps instead of [] if you don't want to
+add default values for unknown keys
+
+use std::map if order is required, else std::unordered_map is
+likely better
+
+std::unordered_set is nearly identical to std::unordered_map 
+except that it only contains keys and no values
+
+Creating a new hash function by combining existing hash functions 
+using exclusive-or (ˆ) is simple and often very effective
+namespace std { // make a hash function for Record
+    template<> 
+        struct hash<Record> {
+            using argument_type = Record;
+            using result_type = std::size_t;
+            size_t operator()(const Record& r) const
+            {
+                return hash<string>()(r.name) ˆ hash<int>()(r.product_code);
+            }
+        };
+}
+
+use std::deque for stacks/queues or a suitable adaptor
