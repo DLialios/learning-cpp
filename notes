@@ -1,3 +1,10 @@
+C allows superfluous parentheses around function 
+parameter declarations
+int f(int (a)) {} <--> int f(int a) {}
+
+int i(int(x)); // vexing parse
+int i(int());  // vexing parse
+
 the user shouldn't be forced to pay a cost that they 
 don't absolutely have to
 
@@ -30,6 +37,8 @@ dynamic cast --> only casts to reference type throw
 static cast
 reinterpret cast
 const cast
+
+int(3) vs (int)3
 
 early vs late binding and runtime polymorphism
 
@@ -353,3 +362,23 @@ namespace std { // make a hash function for Record
 }
 
 use std::deque for stacks/queues or a suitable adaptor
+
+A standard algorithm is expressed in terms of (half-open) 
+sequences of elements. A sequence is represented by a pair 
+of iterators specifying the first element and the one-beyond
+-the-last element
+
+sort,binary_search
+find
+begin,rbegin,cbegin,crbegin,advance
+back_inserter,front_inserter
+
+Iterators are used to separate algorithms and containers. An
+algorithm operates on its data through iterators and knows nothing
+about the container in which the elements are stored. Conversely,
+a container knows nothing about the algorithms operating on its
+elements; all it does is to supply iterators upon request (e.g.,
+begin() and end()). This model of separation between data storage
+and algorithm delivers very general and flexible software.
+
+Input iterators are used in pairs representing a sequence
