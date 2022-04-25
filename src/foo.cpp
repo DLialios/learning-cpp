@@ -87,8 +87,11 @@ void Foo::swap(Bar& a,Bar& b) noexcept {
 
 void* Foo::Bar::operator new(size_t size, int x)
 {
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
     void* ret = std::malloc(size);
     std::cout << ret << "\toperator new(size_t,int)\n";
+#pragma GCC diagnostic pop
     return ret;
 }
 
