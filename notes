@@ -1,153 +1,133 @@
-C allows superfluous parentheses around function 
-parameter declarations
+superfluous parentheses around function param declarations
 int f(int (a)) {} <--> int f(int a) {}
-
 int i(int(x)); // vexing parse
 int i(int());  // vexing parse
 
-the user shouldn't be forced to pay a cost that they 
-don't absolutely have to
-
-reference qualified member functions
+reference-qualified member functions
 
 const pointer vs pointer to const
 
-argument dependent lookup (ADL)
+declare/define vs initialize/assign
+
+qualified vs unqualified names
+qualified names include an associated scope
+C::s_member; // s_member is qualified by class C
+obj.x;	     // x is qualified by class object obj
+ptr->y;	     // y is qualified by pointer to class object ptr
+
+using declaration vs using directive
+  using declaration 
+    inject declarations into curr scope
+  using directive 
+    inject declarations into lowest common ancestor
+
+argument-dependent lookup
+0. look in curr namespace for matching name
+1. check for declaration of: 
+     - class member with same name
+     - func at block scope that's not a using-declaration
+2. use ADL
+3. resort to fallback e.g. using std::swap
 
 lifetime extension of temporaries via rval refs
-    - a temporary bound to a return value of a function
-      in a return statement is not extended: it is 
-      destroyed immediately at the end of the return 
-      expression. Such function always returns a dangling 
-      reference.
+  auto vars in func scope are destroyed after
+  ret val placeholder is all set; careful
+  with returning dangling references
 
-std::cout << "hello" << "\n";
-std::operator<<(std::operator<<(std::cout,"hello"),"\n");
-
-The technique of acquiring resources in a
-constructor and releasing them in a destructor,
-known as Resource Acquisition Is Initialization or RAII,
-allows us to eliminate ‘‘naked new operations,’’ that is, 
-to avoid allocations in general code and keep them buried 
-inside the implementation of well-behaved abstractions. 
-
-dynamic cast --> only casts to reference type throw
-                 Does this polymorphic object have the
-                 given class in its hierarchy?
-static cast
+dynamic	    cast
+static	    cast
 reinterpret cast
-const cast
+const	    cast
+    dynamic ->	only casts to reference type throw
+		Does this polymorphic object have the
+		given class in its hierarchy?
 
 int(3) vs (int)3
 
-early vs late binding and runtime polymorphism
+default	    init
+value	    init
+direct	    init
+copy	    init
+list	    init
+aggregate   init
+reference   init
 
-vtables in class objects
+dynamic dispatch through vtables
 
 inheritance access modifiers
 
-one implicit conversion of function parameters
+one unambiguous implicit conversion sequence from T1 to T2
 
-explicit keyword
-
-A virtual destructor is essential for an 
-abstract class because an object of a 
-derived class is usually manipulated through 
-the interface provided by its abstract base 
-class. In particular, it may be deleted through 
-a pointer to a base class. Then, the virtual 
-function call mechanism ensures that the proper 
-destructor is called. That destructor then 
-implicitly invokes the destructors of its members
-and then its base.
+eval order of func args is unspecified
 
 smart pointers: unique_ptr, shared_ptr, weak_ptr
-make_unique, make_shared
-func(unique_ptr<MyClass>(new MyClass), a(), b());
 
 only lambdas without captures decay to function pointers
+trailing returns on lambdas
 
-conversion constructor vs conversion function
+conversion constructor vs conversion function;explicit keyword
 
-functions =delete and =default
-
-rules for automatic generation of essential class functions
-
-1) CTOR args
-2) base class constructor
-3) constructor member initializer list; 
-   use default member initializers if missing 
-4) actual CTOR body
-
-default member initializers allow only initializers of
-the “= initializer-clause” and “{ initializer-list }” forms
-
-new and delete keywords; they call operator new() and 
-operator delete() as well as construct/destruct the object itself
-::new(placement-params) type|initializer
-new expressions evaluate to a pvalue of type "pointer to x"
-The default placement new allows you to construct an object 
-in memory that's already allocated.  
-
-deallocate vs deconstruct
-  Bar* b = new(42) Bar;
-  b->~Bar();
-  ::new(b) Bar;
-  delete b; // delete calls the dtor
+compiler-generated func: =delete and =default
 
 Rule of Zero: If you can avoid defining default operations, do
 Rule of Five: If you define or =delete any copy, move, or 
               destructor function, define or =delete them all
 
-double& operator[](int i);
-        versus
-const double& operator[](int i) const;
+CTOR
+1) CTOR args
+2) base class constructor
+3) constructor member initializer list; 
+   use default member initializers if missing 
+4) CTOR body
 
-In particular, we can achieve strong resource safety;
-that is, we can eliminate resource leaks for a 
-general notion of a resource. Examples are vectors 
-holding memory, threads holding system threads, 
-and fstreams holding file handles.
+default member initializers do not allow () form 
 
-Also, memory is not the only resource. A resource 
-is anything that has to be acquired and (explicitly 
-or implicitly) released after use. Examples are memory, 
-locks, sockets, file handles, and thread handles.
+DTOR
+1) DTOR body
+2) run DTORs of each class member
+3) invoke DTOR of parent class
 
-Before resorting to garbage collection, systematically 
-use resource handles: let each resource have an owner 
-in some scope and by default be released at the end 
-of its owners scope.
+new/delete expressions
+    operator new() then CTOR
+    DTOR then operator delete() 
 
-RAII is pervasive in the STL and the result is implicit 
-resource management that is invisible in common use
-with low resource retention durations.
+placement new
+::new(placement-params) type|initializer
 
-CTAD in c++17
-c++11 -> only function templates could have their 
-         template arguments deduced
+deconstruct vs deallocate 
 
-A “template function” is the instantiation of a “function template”.
-A “parameterized type” is another way to say “class template.” 
+use RAII to achieve strong resource safety
+    eliminate resource leaks for a 
+    general notion of a resource
+    (memory, locks, sockets, file&thread handles)
+
+pointers to member functions
+    unsigned (Bar::*ptr)() const = &yoda::Bar::roll;
+
+A “template function” is the instantiation of a “function template”
+
+CTAD does not exist prior to c++17
+
+explicit template instantiation 
+    explicit parameterized type instantiation
+	template class Foo<std::string>;
+    explicit function template instantiation
+	template void print<std::string>(std::string);
 
 typename vs class 
 - specifying a template: same
 - use typename for dependent names
-- use class for explicit template instantiation 
-    eg. template class Foo<std::string>;
-            --> explicit parameterized type instantiation
-    eg. template void print<std::string>(std::string);
-            --> explicit function template instantiation
-- use class for template template (not required since c++17)
+- use class for template template (< c++17)
 
-template function overload resolution:
-- nontemplate functions are first-class citizens
-- if it's clear that there's one "most specialized" 
-  function base template, that one gets used. If 
-  that base template happens to be specialized for 
-  the types being used, the specialization will get used
-- the call is ambiguous if there is a tie for the 
-  "most specialized" function base template
+template function overload resolution
+- nontemplate functions = first-class citizens
+- if there is a suitable base function template use it
+- if a specialization exists (for this base) for the
+  types being used then use it
+
+template param pack vs function param pack
+parameter packs indicate a sequence of length sizeof...(pack)
+pack expansion on a pattern f(g(pack)...);
 
 fold types:
 - unary right fold (vals + ...) becomes 
@@ -158,28 +138,22 @@ fold types:
   (vals[0] + (... + (vals[N-1] + (vals[N] + 0))))
 - binary left fold (0 + ... + vals) becomes
   ((((0 + vals[0]) + vals[1]) + ...) + vals[N])
-  
+
+templates
+    class
+    function
+    alias
+    variable
+    deduction guides
+ 
 using vs typedef vs namespace
 - alias templates only work with 'using'
-- 'typedef' declarations are technically init-statements
+- typedefs are technically init-statements
 
-In computing, type introspection is the ability of a
-program to examine the type or properties of an object
-at runtime. Some programming languages possess this capability.
-Introspection should not be confused with reflection, 
-which goes a step further and is the ability for a program 
-to manipulate the values, meta-data, properties and/or 
-functions of an object at runtime. Some programming languages,
-e.g. Java, also possess that capability.
 
 A template argument for which a concept is specified is
 called a constrained argument and a template for which 
 an argument is constrained is called a constrained template.
-
-Types of pointers to member functions:
-Bar (Bar::*ptr)(const Bar&) const;
-
-Return value optimization (RVO) is a certain kind of copy elision
 
 Substitution failure is not an error (SFINAE)
 
@@ -303,17 +277,6 @@ template<is_sortable auto NonTypeParameter, is_sortable TypeParameter>
 We omit the first concept parameter when using the inline syntax 
 (either with auto or a template)
 
-The typename... indicates that Tail is a sequence of types. The Tail...
-indicates that tail is a sequence of values of the types in Tail.
-sizeof...() yields size of parameter pack
-
-template parameter pack vs. function parameter pack
-
-A pattern followed by an ellipsis, in which the name of at least one
-parameter pack appears at least once, is expanded into zero or more 
-comma-separated instantiations of the pattern, where the name of the 
-parameter pack is replaced by each of the elements from the pack, in 
-order.
 
 default vs. value initialization
 if you define a default constructor, it will be called regardless
