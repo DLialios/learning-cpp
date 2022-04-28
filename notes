@@ -44,6 +44,22 @@ const	    cast
 
 int(3) vs (int)3
 
+obj->x;
+obj.operator->()->x;
+if ret val is another object of class type (not a ptr),
+then chain operator->() calls until one returns a pointer
+
+range-for semantics
+Container c;
+for (auto i : c)
+    foo(i);
+||||||||||||||||||
+VVVVVVVVVVVVVVVVVV
+for (auto it = c.begin(), end = c.end(); it != end; ++it) { 
+    auto i = *it; 
+    foo(i);
+}
+
 default	    init
 value	    init
 direct	    init
@@ -104,7 +120,11 @@ use RAII to achieve strong resource safety
 pointers to member functions
     unsigned (Bar::*ptr)() const = &yoda::Bar::roll;
 
+const type qualifier is useless on func ret type
+
 A “template function” is the instantiation of a “function template”
+
+A template's declaration and definition must be in scope for use
 
 CTAD does not exist prior to c++17
 
@@ -113,6 +133,7 @@ explicit template instantiation
 	template class Foo<std::string>;
     explicit function template instantiation
 	template void print<std::string>(std::string);
+full specialization does instantiate
 
 typename vs class 
 - specifying a template: same
@@ -145,41 +166,22 @@ templates
     alias
     variable
     deduction guides
+
+if constexpr() and noexcept() for compile-time code gen
  
 using vs typedef vs namespace
 - alias templates only work with 'using'
 - typedefs are technically init-statements
 
+all expr have a type and value category
+    p(ure)rvalue lvalue x(piring)value 
 
-A template argument for which a concept is specified is
-called a constrained argument and a template for which 
-an argument is constrained is called a constrained template.
-
-Substitution failure is not an error (SFINAE)
-
-every expression has two independent properties:
-type and value category
-
-the three primary value categories are:
-prvalue lvalue xvalue 
-    Pure rvalue refers to an object that is a temporary in the 
-    “pure sense": an expression for which the compiler can tell 
-    with absolute certainty that its evaluation is an object 
-    that is a temporary that has just been created and that is
-    immediately expiring (unless we intervene to prolong it’s 
-    lifetime by reference binding). The object was created during
-    the evaluation of the expression and it will die according to
-    the rules of the “mother expression".
-    An expiring value is an expression that evaluates to a reference
-    to an object that is promised to expire soon. That is it gives
-    you a promise that you can do whatever you want to this object
-    because it will be destroyed next anyway. But you don’t know 
-    when this object was created, or when it is supposed to be 
-    destroyed. You just know that you “intercepted" it as it is 
-    just about to die.
+string literals are lvalues because of their loc in data segment
+auto str = "hello";	--> str is const char*
+auto& str = "hello";	--> str is const char &[6]
 
 decltype(e)
-    - parenthesis denote 'treat this as an expression instead of an entity'
+    - parenthesis => 'treat this as an expression instead of an entity'
     - if the value category of expression is prvalue,
       then decltype yields T
     - if the value category of expression is lvalue,
@@ -187,71 +189,20 @@ decltype(e)
     - if the value category of expression is xvalue, 
       then decltype yields T&&
 
-The rules of reference collapsing apply when you use references 
-to references through one of the following contexts:
-    - A decltype specifier
-    - A typedef name
-    - A template type param
-    - Definition of auto variables
+universal refs & type deduction
+    ignore top-level cv-qualifiers for P and A
+    deduced type is always the referenced type
+    (except when P is universal ref and A is lvalue)
 
-const type qualifier is useless on function return types
+******************************
 
-If a variable or parameter is declared to have type T&& 
-for some deduced type T, that variable or parameter is a
-universal reference.
+A template argument for which a concept is specified is
+called a constrained argument and a template for which 
+an argument is constrained is called a constrained template.
 
-Function template argument deduction:
-  the special case of forwarding references
-    - If P is a reference type, the referenced type is used for deduction
-    - If P is an rvalue reference to a cv-unqualified template parameter 
-      (so-called forwarding reference), and the corresponding function 
-      call argument is an lvalue, the type lvalue reference to A is 
-      used in place of A for deduction 
-
-noexcept has its own operator
-
-objects do not have to be referred to by lvalues, they may be
-referred to by rvalues; string literals are lvalues
-
-auto str = "hello"; --> str is const char*
-auto& str = "hello"; --> str is const char &[6]
-
-typedef int* test;
-int a = 3;
-const test (&x) = &a;
-int* const (&z) = &a;
-// x and z have the same type
-
-This ambiguity regarding the lvalueness and rvalueness of what a universal
-reference is bound to is the motivation for std::forward to take a universal
-reference lvalue and convert it into an rvalue only if the expression it’s
-bound to is an rvalue.  The name of the function (“forward”) is an
-acknowledgment that our desire to perform such a conversion is virtually always
-to preserve the calling argument’s lvalueness or rvalueness when passing –
-forwarding – it to another function.
-
-someIterator->f()
-someIterator.operator->()->f()
-Drill-down behavior: the language chains together operator-> calls until
-the last one returns a pointer (this happens only if the return value of 
-the overload is an object of class type)
-
-MyContainer c;
-for (auto i : c)
-    std::cout << i << "\n";
-################################
-for (auto it = c.begin(), end = c.end(); it != end; ++it) { 
-    auto i = *it; 
-    std::cout << i << "\n";
-}
+Substitution failure is not an error (SFINAE)
 
 using auto&& in range-for because of iterator returning a proxy reference
-
-Function objects (functors) used to specify the meaning of key operations 
-of a general algorithm are often referred to as policy objects
-
-To use a template, make sure its definition (not just its declaration) 
-is in scope
 
 C++ templates are a compile-time version of duck typing
 
@@ -292,9 +243,6 @@ ordinary member functions get 3 things:
 -->friends get only 1
 -->static functions get 1 and 2
 
-It is generally in poor taste to dump every name from a namespace
-into the global namespace
-All standard-library headers supply declarations in namespace std
 
 use std::list where you need to insert/erase elements and not invalidate
 iterators. std::vector invalidates all iterators on insert and erase.

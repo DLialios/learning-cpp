@@ -296,29 +296,21 @@ namespace Templates7 {
 }
 
 namespace Templates8 {
-    // universal reference
-    template<typename T>
-        void f(T&& var) {
-            constexpr bool b =
-                std::is_same_v<decltype(var),int&&>;
-            static_assert(b);
-        }
+template<typename T> void f(T&& var) { }
+template<typename T> void f2(const T& var) { }
+template<typename T> void f3(T var) { }
+template<typename T> void f4(const T var) { }
 
-    template<typename T>
-        void f2(const T& var) {
-            constexpr bool b =
-                std::is_same_v<decltype(var),const int&>;
-            static_assert(b);
-        }
+inline void f() {
+    int x = 3;
+    const int z = 3;
+    const int* const w = &x;
 
-    inline void f() {
-        int x = 3;
-        int& y = x;
-        //f(y);
-        //f2(y);
-        f(std::move(y));
-        f2(std::move(y));
-    }
+    using std::move;
+    f(x);
+    f(move(x));
+    // ... 
+}
 }
 
 namespace Templates8_1 {
