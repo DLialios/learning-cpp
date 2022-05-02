@@ -1,3 +1,5 @@
+****************************** LANG
+
 superfluous parentheses around function param declarations
 int f(int (a)) {} <--> int f(int a) {}
 int i(int(x)); // vexing parse
@@ -60,6 +62,9 @@ for (auto it = c.begin(), end = c.end(); it != end; ++it) {
     foo(i);
 }
 
+using auto&& in range-for because of iterators returning
+temporaries or proxy refs when dereferenced
+
 default	    init
 value	    init
 direct	    init
@@ -103,6 +108,13 @@ DTOR
 2) run DTORs of each class member
 3) invoke DTOR of parent class
 
+ordinary member functions get 3 things:
+1 access to internals of class
+2 are in the scope of the class
+3 must be invoked on an instance
+-->friends get only 1
+-->static functions get 1 and 2
+
 new/delete expressions
     operator new() then CTOR
     DTOR then operator delete() 
@@ -125,6 +137,8 @@ const type qualifier is useless on func ret type
 A “template function” is the instantiation of a “function template”
 
 A template's declaration and definition must be in scope for use
+
+templates are a compile-time version of duck typing
 
 CTAD does not exist prior to c++17
 
@@ -189,22 +203,22 @@ decltype(e)
     - if the value category of expression is xvalue, 
       then decltype yields T&&
 
-universal refs & type deduction
-    ignore top-level cv-qualifiers for P and A
+universal refs and type deduction
+    if P is universal ref and A is lvalue
+	-> deduced type is A&
+    if P is cv-qualified 
+	-> ignore top-level cv-qualifiers on P and A
+    if P is not a ref type 
+	-> ignore top-level cv-qualifiers on A
     deduced type is always the referenced type
-    (except when P is universal ref and A is lvalue)
 
-******************************
+substitution failure is not an error (SFINAE)
+
+****************************** CONCEPTS c++20
 
 A template argument for which a concept is specified is
 called a constrained argument and a template for which 
 an argument is constrained is called a constrained template.
-
-Substitution failure is not an error (SFINAE)
-
-using auto&& in range-for because of iterator returning a proxy reference
-
-C++ templates are a compile-time version of duck typing
 
 requires-expressions vs. requires-clauses
 A concept is a compile-time predicate specifying how one or more types 
@@ -228,68 +242,20 @@ template<is_sortable auto NonTypeParameter, is_sortable TypeParameter>
 We omit the first concept parameter when using the inline syntax 
 (either with auto or a template)
 
+****************************** STL
 
-default vs. value initialization
-if you define a default constructor, it will be called regardless
-int x;
-int* x = new int;
-int x{};
-int* x = new int();
+use std::list when you don't want to invalidate iterators
 
-ordinary member functions get 3 things:
-1 access to internals of class
-2 are in the scope of the class
-3 must be invoked on an instance
--->friends get only 1
--->static functions get 1 and 2
+use std::map only if order is required
 
-
-use std::list where you need to insert/erase elements and not invalidate
-iterators. std::vector invalidates all iterators on insert and erase.
-std::list guarantees that iterators to existing elements are still 
-valid 
-
-use find() and insert() for maps instead of [] if you don't want to
-add default values for unknown keys
-
-use std::map if order is required, else std::unordered_map is
-likely better
-
-std::unordered_set is nearly identical to std::unordered_map 
-except that it only contains keys and no values
-
-Creating a new hash function by combining existing hash functions 
-using exclusive-or (ˆ) is simple and often very effective
-namespace std { // make a hash function for Record
-    template<> 
-        struct hash<Record> {
-            using argument_type = Record;
-            using result_type = std::size_t;
-            size_t operator()(const Record& r) const
-            {
-                return hash<string>()(r.name) ˆ hash<int>()(r.product_code);
-            }
-        };
-}
+std::map<>::operator[] performs an insert if key does not exist
 
 use std::deque for stacks/queues or a suitable adaptor
 
-A standard algorithm is expressed in terms of (half-open) 
-sequences of elements. A sequence is represented by a pair 
-of iterators specifying the first element and the one-beyond
--the-last element
-
-sort,binary_search
-find
-begin,rbegin,cbegin,crbegin,advance
-back_inserter,front_inserter
-
-Iterators are used to separate algorithms and containers. An
-algorithm operates on its data through iterators and knows nothing
-about the container in which the elements are stored. Conversely,
-a container knows nothing about the algorithms operating on its
-elements; all it does is to supply iterators upon request (e.g.,
-begin() and end()). This model of separation between data storage
-and algorithm delivers very general and flexible software.
-
-Input iterators are used in pairs representing a sequence
+sorting and searching
+    sort,binary_search
+    find
+iterators
+    begin,rbegin,cbegin,crbegin
+    advance
+    back_inserter,front_inserter
