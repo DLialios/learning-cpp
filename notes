@@ -11,6 +11,9 @@ const pointer vs pointer to const
 
 declare/define vs initialize/assign
 
+scope resolution operator only works on
+class, enum, namespace
+
 qualified vs unqualified names
 qualified names include an associated scope
 C::s_member; // s_member is qualified by class C
@@ -23,10 +26,15 @@ using declaration vs using directive
   using directive 
     inject declarations into lowest common ancestor
 
-argument-dependent lookup
+argument-dependent lookup for
+unqualified function-call expressions
+(does not work with ctors)
 0. look in curr namespace for matching name
 1. check for declaration of: 
      - class member with same name
+	- are you calling a function within the same
+	  class it was defined?
+	- is the function in question an operator overload?
      - func at block scope that's not a using-declaration
 2. use ADL
 3. resort to fallback e.g. using std::swap
@@ -252,3 +260,5 @@ iterators
     begin,rbegin,cbegin,crbegin
     advance
     back_inserter,front_inserter
+    ostream_iterator,istream_iterator
+    ostreambuf_iterator,istreambuf_iterator
