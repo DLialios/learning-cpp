@@ -125,9 +125,10 @@ void throw_test()
     }
 }
 
+#ifdef CPP20
 void throw_test2()
 {
-    std::vector v {42,42};
+    std::vector v {42,42}; // CTAD
     try {
         std::cout << v.at(v.size());
     } catch (const std::exception& e) {
@@ -137,6 +138,7 @@ void throw_test2()
      * catch(...) {}
      */
 }
+#endif
 
 void udl()
 {

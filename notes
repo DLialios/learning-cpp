@@ -150,6 +150,8 @@ templates are a compile-time version of duck typing
 
 CTAD does not exist prior to c++17
 
+the scope of a macro definition lasts until the end of its translation unit
+
 explicit template instantiation 
     explicit parameterized type instantiation
 	template class Foo<std::string>;
