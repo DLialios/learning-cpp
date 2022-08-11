@@ -203,7 +203,8 @@ all expr have a type and value category
 
 string literals are lvalues because of their loc in data segment
 auto str = "hello";	--> str is const char*
-auto& str = "hello";	--> str is const char &[6]
+auto& str = "hello";	--> str is const char (&)[6]
+arrays of references cannot exist b/c pointer arithmetic would be undefined
 
 decltype(e)
     - parenthesis => 'treat this as an expression instead of an entity'
@@ -215,13 +216,8 @@ decltype(e)
       then decltype yields T&&
 
 universal refs and type deduction
-    if P is universal ref and A is lvalue
-	-> deduced type is A&
-    if P is cv-qualified 
-	-> ignore top-level cv-qualifiers on P and A
-    if P is not a ref type 
-	-> ignore top-level cv-qualifiers on A
-    deduced type is always the referenced type
+    think first:
+    can we bind to the arg?; can we construct the param from the arg?
 
 substitution failure is not an error (SFINAE)
 
