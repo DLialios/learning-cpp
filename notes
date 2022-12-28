@@ -139,6 +139,7 @@ use RAII to achieve strong resource safety
 
 pointers to member functions
     unsigned (Bar::*ptr)() const = &yoda::Bar::roll;
+    (p->*ptr)();
 
 const type qualifier is useless on func ret type
 
